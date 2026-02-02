@@ -26,7 +26,7 @@ export const createAlbum = async (req, res) => {
 
         const [rows] = await db.query(
             `SELECT 
-                al.id AS id,           ← ← ADICIONE ESTA LINHA
+                al.id AS id,         
                 al.title AS album,
                 al.release_date AS ano,
                 ar.name AS artista
