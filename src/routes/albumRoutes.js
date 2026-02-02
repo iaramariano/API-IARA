@@ -5,12 +5,16 @@ import {
     updateAlbum, 
     deleteAlbum 
 } from "../controllers/albumController.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+// GET público
 router.get("/", getAlbums);
-router.post("/", createAlbum);
-router.put("/:id", updateAlbum);
-router.delete("/:id", deleteAlbum);
+
+// POST/PUT/DELETE c token
+router.post("/", authMiddleware, createAlbum);
+router.put("/:id", authMiddleware, updateAlbum);
+router.delete("/:id", authMiddleware, deleteAlbum);
 
 export default router;

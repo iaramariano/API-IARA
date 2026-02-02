@@ -1,17 +1,15 @@
 import express from "express";
-import { 
-    getArtists, 
-    createArtist, 
-    updateArtist, 
-    deleteArtist 
-} from "../controllers/artistController.js";
+import { getArtists, createArtist, updateArtist, deleteArtist } from "../controllers/artistController.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+// GET público
+router.get("/", getArtists);
 
-router.get("/", getArtists);       // GET 
-router.post("/", createArtist);    // POST 
-router.put("/:id", updateArtist);  // PUT 
-router.delete("/:id", deleteArtist); // DELETE 
+// POST/PUT/DELETE com token
+router.post("/", authMiddleware, createArtist);
+router.put("/:id", authMiddleware, updateArtist);
+router.delete("/:id", authMiddleware, deleteArtist);
 
 export default router;
