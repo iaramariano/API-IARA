@@ -4,7 +4,7 @@ import db from "../db.js";
 export const getAlbums = async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT al.id, al.title, al.release_year, ar.name as artista 
+            SELECT al.id, al.title, al.release_date, ar.name as artista 
             FROM albums al
             JOIN artists ar ON al.artist_id = ar.id
         `);
@@ -20,15 +20,16 @@ export const createAlbum = async (req, res) => {
         const { titulo, artista_id, ano_lancamento } = req.body;
 
         const [result] = await db.query(
-            "INSERT INTO albums (title, artist_id, release_year) VALUES (?, ?, ?)",
+            "INSERT INTO albums (title, artist_id, release_date) VALUES (?, ?, ?)",
             [titulo, artista_id, ano_lancamento]
         );
 
         const [rows] = await db.query(
             `SELECT 
-                al.title  AS album,
-                al.release_year AS ano,
-                ar.name   AS artista
+                al.id AS id,           ← ← ADICIONE ESTA LINHA
+                al.title AS album,
+                al.release_date AS ano,
+                ar.name AS artista
              FROM albums al
              JOIN artists ar ON ar.id = al.artist_id
              WHERE al.id = ?`,
@@ -41,6 +42,7 @@ export const createAlbum = async (req, res) => {
     }
 };
 
+
 // PUT
 export const updateAlbum = async (req, res) => {
     try {
@@ -52,7 +54,7 @@ export const updateAlbum = async (req, res) => {
         }
 
         const [result] = await db.query(
-            "UPDATE albums SET title = ?, artist_id = ?, release_year = ? WHERE id = ?",
+            "UPDATE albums SET title = ?, artist_id = ?, release_date = ? WHERE id = ?",
             [titulo, artista_id, ano_lancamento, id]
         );
 

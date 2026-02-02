@@ -1,37 +1,31 @@
-// src/controllers/authController.js
+import jwt from 'jsonwebtoken';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase.js";
+
+const JWT_SECRET = process.env.JWT_SECRET || 'bearer_token';
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ error: "Email e senha são obrigatórios" });
-    }
-
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        
-        const user = userCredential.user;
-        const token = await user.getIdToken();
+        const firebaseUser = userCredential.user;
+
+        const meuToken = jwt.sign(
+            { 
+                uid: firebaseUser.uid,
+                email: firebaseUser.email 
+            },
+            JWT_SECRET,
+            { expiresIn: '7d' } 
+        );
 
         return res.status(200).json({
             mensagem: "Tá liberado",
-            token: token,
+            token: meuToken, 
         });
 
     } catch (error) {
-        let mensagemErro = "F, tenta de novo";
-        
-        if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
-            mensagemErro = "Email ou senha incorretos";
-        } else if (error.code === 'auth/too-many-requests') {
-            mensagemErro = "Muitas tentativas com e-mail e/ou senha inválidos. Tente novamente mais tarde.";
-        }
-
-        return res.status(401).json({ 
-            error: mensagemErro,
-            codigo: error.code 
-        });
+        return res.status(401).json({ error: "Ixi tem algo errado" });
     }
 };

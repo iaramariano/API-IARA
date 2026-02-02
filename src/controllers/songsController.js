@@ -3,9 +3,8 @@ import db from "../db.js";
 // GET
 export const getSongs = async (req, res) => {
     try {
-      
         const [rows] = await db.query(`
-            SELECT s.id, s.title, s.duracao_segundos, 
+            SELECT s.id, s.title, 
                    a.title as album, ar.name as artista
             FROM songs s
             JOIN albums a ON s.album_id = a.id
@@ -13,32 +12,30 @@ export const getSongs = async (req, res) => {
         `);
         res.status(200).json(rows);
     } catch (erro) {
-        res.status(500).send("Erro no banco: " + erro.message);
+        res.status(500).json({ erro: erro.message });  
     }
 };
 
 // POST 
 export const createSong = async (req, res) => {
     try {
-        const { titulo, album_id, artista_id, duracao_segundos } = req.body;
+        const { titulo, album_id, artista_id } = req.body;
 
         const [result] = await db.query(
-            "INSERT INTO songs (title, album_id, artist_id, duracao_segundos) VALUES (?, ?, ?, ?)",
-            [titulo, album_id, artista_id, duracao_segundos]
+            "INSERT INTO songs (title, album_id, artist_id) VALUES (?, ?, ?)", 
+            [titulo, album_id, artista_id]
         );
 
-        const [rows] = await db.query(
-            `SELECT
+        const [rows] = await db.query(`
+            SELECT
                 s.title  AS musica,
                 a.title  AS album,
-                ar.name  AS artista,
-                s.duracao_segundos
-             FROM songs s
-             JOIN albums a  ON a.id  = s.album_id
-             JOIN artists ar ON ar.id = s.artist_id
-             WHERE s.id = ?`,
-            [result.insertId]
-        );
+                ar.name  AS artista   -- Fixed: Added comma here
+            FROM songs s
+            JOIN albums a ON a.id = s.album_id  -- Fixed: Removed comma before JOIN
+            JOIN artists ar ON ar.id = s.artist_id
+            WHERE s.id = ?
+        `, [result.insertId]);
 
         return res.status(201).json(rows[0]);
     } catch (erro) {
@@ -65,7 +62,7 @@ export const updateSong = async (req, res) => {
             SELECT 
                 s.title as musica,
                 a.title as album,
-                art.name as artista
+                art.name as artista  -- Consistent alias
             FROM songs s
             JOIN albums a ON s.album_id = a.id
             JOIN artists art ON s.artist_id = art.id
@@ -73,7 +70,6 @@ export const updateSong = async (req, res) => {
         `, [id]);
 
         res.status(200).json(dados[0]);
-
     } catch (erro) {
         res.status(500).json({ erro: erro.message });
     }
