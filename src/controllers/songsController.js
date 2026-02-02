@@ -30,9 +30,9 @@ export const createSong = async (req, res) => {
             SELECT
                 s.title  AS musica,
                 a.title  AS album,
-                ar.name  AS artista   -- Fixed: Added comma here
+                ar.name  AS artista 
             FROM songs s
-            JOIN albums a ON a.id = s.album_id  -- Fixed: Removed comma before JOIN
+            JOIN albums a ON a.id = s.album_id 
             JOIN artists ar ON ar.id = s.artist_id
             WHERE s.id = ?
         `, [result.insertId]);
@@ -62,7 +62,7 @@ export const updateSong = async (req, res) => {
             SELECT 
                 s.title as musica,
                 a.title as album,
-                art.name as artista  -- Consistent alias
+                art.name as artista 
             FROM songs s
             JOIN albums a ON s.album_id = a.id
             JOIN artists art ON s.artist_id = art.id
