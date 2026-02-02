@@ -18,8 +18,8 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoutes);
 
-app.use("/artistas", authMiddleware, artistRoutes);
-app.use("/albuns", authMiddleware, albumRoutes);
-app.use("/musicas", authMiddleware, songsRoutes);
+app.use("/artistas", artistRoutes);
+app.use("/albuns", albumRoutes);
+app.use("/musicas", songsRoutes);
 
 export default app;
